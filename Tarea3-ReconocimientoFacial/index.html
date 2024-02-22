@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captura de Fotos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        #videoContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #videoElement, #canvasElement {
+            border: 5px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        #videoElement {
+            max-width: 100%;
+            height: auto;
+        }
+        #canvasElement {
+            max-width: 80%;
+            height: auto;
+            margin-top: 20px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .button-container button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="videoContainer">
+        <div>
+            <form id="captureForm" method="post" enctype="multipart/form-data">
+                <video id="videoElement" autoplay></video>
+                <div class="button-container">
+                    <button type="button" id="takeSnapshot">Tomar Foto</button>
+                    <button type="button" id="saveSnapshot">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <canvas id="canvasElement" width="640" height="480"></canvas>
+    
+    <script>
+        const video = document.getElementById("videoElement");
+        const canvas = document.getElementById("canvasElement");
+        const ctx = canvas.getContext('2d');
+        let photoCounter = 0;
+    
+        navigator.mediaDevices.getUserMedia({video: true})
+        .then((stream) => {
+            video.srcObject = stream;
+        })
+        .catch((error) => {
+            console.error('Error accessing the camera:', error);
+        });
+    
+        document.getElementById("takeSnapshot").addEventListener("click", () => {
+            takePicture();
+        });
+    
+        // Corrección aquí: asignar evento click para el botón "Guardar"
+        document.getElementById("saveSnapshot").addEventListener("click", () => {
+            savePicture();
+        });
+    
+        function takePicture() {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            photoCounter++;
+            console.log("Foto tomada: " + photoCounter);
+        }
+    
+        function savePicture() {
+            // Obtener la fecha y hora actual
+            const timestamp = new Date().toLocaleString();
+        
+            const xhr = new XMLHttpRequest();
+    
+            xhr.open("POST", "guardar_foto.php", true);
+    
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    
+            // Manejar la respuesta del servidor
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        // Mostrar mensaje al usuario
+                        alert(xhr.responseText);
+                    } else {
+                        console.error("Error al guardar la foto en el servidor.");
+                    }
+                }
+            };
+    
+            // Enviar la solicitud al servidor
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
+
+
