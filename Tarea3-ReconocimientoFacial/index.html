@@ -84,7 +84,7 @@
             takePicture();
         });
     
-        // Corrección aquí: asignar evento click para el botón "Guardar"
+        // Asignar evento click para el botón "Guardar"
         document.getElementById("saveSnapshot").addEventListener("click", () => {
             savePicture();
         });
@@ -116,7 +116,7 @@
                     }
                 }
             };
-    
+            //El mensaje no se refleja al guardar la foto "Revisar"//
             // Enviar la solicitud al servidor
             xhr.send();
         }
